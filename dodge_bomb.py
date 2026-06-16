@@ -1,3 +1,4 @@
+import time
 import os
 import random
 import sys
@@ -29,6 +30,31 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
 
     return yoko, tate
 
+def gameover(screen: pg.Surface) -> None:
+    go_img = pg.Surface((1100, 650))#半透明の黒長方形
+    pg.draw.rect(go_img,(0, 0, 0,), pg.Rect(0, 0, 1100, 650))
+    go_img.set_alpha(200)
+
+    fonto = pg.font.Font(None, 50)#GAME OVERの文字
+    txt = fonto.render("GAME OVER", True, (255, 255, 255))
+    txt_rct = txt.get_rect()
+    txt_rct.center = 550, 300
+    go_img.blit(txt, txt_rct)
+
+    cry_img1 = pg.image.load("fig/8.png")#左側のこうかとん画像
+    cry_rct1 = cry_img1.get_rect()
+    cry_rct1.center = 400, 300
+    go_img.blit(cry_img1, cry_rct1)
+
+    cry_img2 = pg.image.load("fig/8.png")#右側のこうかとん画像
+    cry_rct2 = cry_img2.get_rect()
+    cry_rct2.center = 700, 300
+    go_img.blit(cry_img2, cry_rct2)
+
+    screen.blit(go_img,[0,0])#go_imgSurface(図形、文字、画像×２)をscreenSurfaceにblit
+    pg.display.update()
+    time.sleep(5)#5秒止まる
+
 def main():
     #こうかとん初期化
     pg.display.set_caption("逃げろ！こうかとん")
@@ -48,13 +74,16 @@ def main():
     # bb_rct.centery = random.randint(0, HEIGHT) #横座標と縦座標を別々に指定もできる
     bb_img.set_colorkey((0, 0, 0))
     vx, vy = +5, +5#移動速度設定
+
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: #pg.QUIT：×ボタン
                 return
         if kk_rct.colliderect(bb_rct):#kk_rctがbb_rctと重なったら
             print("ゲームオーバー")
-            return #main関数から抜ける
+            gameover(screen)
+            return # return #main関数から抜ける
+        
         screen.blit(bg_img, [0, 0]) 
 
         key_lst = pg.key.get_pressed()
@@ -84,7 +113,6 @@ def main():
         if not tate:
             vy *= -1
             
-
         screen.blit(kk_img, kk_rct)
         screen.blit(bb_img, bb_rct)#練習２：描画
         pg.display.update()
@@ -97,3 +125,4 @@ if __name__ == "__main__":
     main()
     pg.quit()
     sys.exit()
+
