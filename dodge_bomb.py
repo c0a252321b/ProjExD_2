@@ -50,8 +50,11 @@ def main():
     vx, vy = +5, +5#移動速度設定
     while True:
         for event in pg.event.get():
-            if event.type == pg.QUIT: 
+            if event.type == pg.QUIT: #pg.QUIT：×ボタン
                 return
+        if kk_rct.colliderect(bb_rct):#kk_rctがbb_rctと重なったら
+            print("ゲームオーバー")
+            return #main関数から抜ける
         screen.blit(bg_img, [0, 0]) 
 
         key_lst = pg.key.get_pressed()
