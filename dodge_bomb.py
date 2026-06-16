@@ -1,4 +1,5 @@
 import os
+import random
 import sys
 import pygame as pg
 
@@ -14,6 +15,7 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
 def main():
+    #こうかとん初期化
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("fig/pg_bg.jpg")    
@@ -22,6 +24,15 @@ def main():
     kk_rct.center = 300, 200
     clock = pg.time.Clock()
     tmr = 0
+    #練習２：爆弾初期化 28~35
+    bb_img = pg.Surface((20, 20)) #空のSurface作成。20×20のキャンバス
+    pg.draw.circle( bb_img,(255, 0, 0), (10, 10), 10)
+    bb_rct = kk_img.get_rect()
+    bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT) #rectの中心座標を乱数で生成。タプル。
+    # bb_rct.centerx = random.randint(0, WIDTH)
+    # bb_rct.centery = random.randint(0, HEIGHT) #横座標と縦座標を別々に指定もできる
+    bb_img.set_colorkey((0, 0, 0))
+    vx, vy = +5, +5#移動速度設定
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
@@ -38,13 +49,15 @@ def main():
         #     sum_mv[0] -= 5
         # if key_lst[pg.K_RIGHT]:
         #     sum_mv[0] += 5
-        for key, mv in DELTA.items():
+        for key, mv in DELTA.items():#練習１辞書をfor文で回す
             if key_lst[key]:
                 sum_mv[0] += mv[0]
                 sum_mv[1] += mv[1]
-                
+
         kk_rct.move_ip(sum_mv)
+        bb_rct.move_ip(vx, vy)#練習２：移動させる
         screen.blit(kk_img, kk_rct)
+        screen.blit(bb_img, bb_rct)#練習２：描画
         pg.display.update()
         tmr += 1
         clock.tick(50)
