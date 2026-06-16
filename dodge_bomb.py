@@ -13,6 +13,21 @@ DELTA = {
 }
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+#練習３
+#               引数はpygameのRectクラス   戻り値はbool型を要素に持つタプル
+def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
+    """
+    引数：こうかとんrct or 爆弾rct
+    戻り値：
+    """
+    yoko, tate =True, True
+    #True：はみ出てない,False：はみ出てる
+    if rct.left < 0 or WIDTH < rct.right:
+        yoko = False
+    if rct.top < 0 or HEIGHT < rct.bottom:
+        tate = False
+
+    return yoko, tate
 
 def main():
     #こうかとん初期化
@@ -55,7 +70,18 @@ def main():
                 sum_mv[1] += mv[1]
 
         kk_rct.move_ip(sum_mv)
+        if check_bound(kk_rct) != (True, True):#練習３True, Trueでなかったら＝はみ出てたら
+            kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
+            #動く予定の距離分マイナスして無かったことにする
+
         bb_rct.move_ip(vx, vy)#練習２：移動させる
+        yoko, tate = check_bound(bb_rct)#練習３
+        if not yoko:
+            vx *= -1 #マイナス1掛けて反転
+        if not tate:
+            vy *= -1
+            
+
         screen.blit(kk_img, kk_rct)
         screen.blit(bb_img, bb_rct)#練習２：描画
         pg.display.update()
