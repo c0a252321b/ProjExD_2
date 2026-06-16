@@ -55,6 +55,17 @@ def gameover(screen: pg.Surface) -> None:
     pg.display.update()
     time.sleep(5)#5秒止まる
 
+def init_bb_imgs() -> tuple[list[pg.Surface],list[int]]:
+    bb_imgs = []
+    for i in range(1, 11):
+        bb_img = pg.Surface((20*i, 20*i))
+        pg.draw.circle(bb_img, (255, 0, 0), (10*i, 10*i), 10*i)
+        bb_imgs.append(bb_img)
+    bb_accs = [a for a in range(1, 11)]
+
+    return bb_imgs, bb_accs
+
+
 def main():
     #こうかとん初期化
     pg.display.set_caption("逃げろ！こうかとん")
@@ -75,7 +86,11 @@ def main():
     bb_img.set_colorkey((0, 0, 0))
     vx, vy = +5, +5#移動速度設定
 
+    avx = vx*bb_accs[min(tmr//500, 9)]
+    bb_img = bb_imgs[min(tmr//500, 9)]
+    bb_rct.width = bb_img.get_rect().width
     while True:
+        par = tmr * 0.005
         for event in pg.event.get():
             if event.type == pg.QUIT: #pg.QUIT：×ボタン
                 return
@@ -106,13 +121,15 @@ def main():
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
             #動く予定の距離分マイナスして無かったことにする
 
-        bb_rct.move_ip(vx, vy)#練習２：移動させる
+        # bb_rct.move_ip(vx, vy)#練習２：移動させる
+        bb_rct.move_ip(vx*par, vy*par)#時間経過で爆弾の移動速度を上げていく
         yoko, tate = check_bound(bb_rct)#練習３
         if not yoko:
             vx *= -1 #マイナス1掛けて反転
         if not tate:
             vy *= -1
             
+        bb_img = pg.transform.rotozoom(bb_img, 0, 1+par)
         screen.blit(kk_img, kk_rct)
         screen.blit(bb_img, bb_rct)#練習２：描画
         pg.display.update()
