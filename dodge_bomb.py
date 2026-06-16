@@ -60,6 +60,7 @@ def init_bb_imgs() -> tuple[list[pg.Surface],list[int]]:
     for i in range(1, 11):
         bb_img = pg.Surface((20*i, 20*i))
         pg.draw.circle(bb_img, (255, 0, 0), (10*i, 10*i), 10*i)
+        bb_img.set_colorkey((0, 0, 0))
         bb_imgs.append(bb_img)
     bb_accs = [a for a in range(1, 11)]
 
@@ -76,21 +77,24 @@ def main():
     kk_rct.center = 300, 200
     clock = pg.time.Clock()
     tmr = 0
+    bb_imgs, bb_accs = init_bb_imgs()
     #練習２：爆弾初期化 28~35
-    bb_img = pg.Surface((20, 20)) #空のSurface作成。20×20のキャンバス
+    bb_img = bb_imgs[min(tmr//500, 9)] #空のSurface作成。20×20のキャンバス
     pg.draw.circle( bb_img,(255, 0, 0), (10, 10), 10)
-    bb_rct = kk_img.get_rect()
+    bb_rct = bb_imgs[0].get_rect()
     bb_rct.center = random.randint(0, WIDTH), random.randint(0, HEIGHT) #rectの中心座標を乱数で生成。タプル。
     # bb_rct.centerx = random.randint(0, WIDTH)
     # bb_rct.centery = random.randint(0, HEIGHT) #横座標と縦座標を別々に指定もできる
-    bb_img.set_colorkey((0, 0, 0))
+    
     vx, vy = +5, +5#移動速度設定
 
-    avx = vx*bb_accs[min(tmr//500, 9)]
-    bb_img = bb_imgs[min(tmr//500, 9)]
-    bb_rct.width = bb_img.get_rect().width
+    
+    # bb_rct.width = bb_img.get_rect().width
     while True:
-        par = tmr * 0.005
+        avx = vx*bb_accs[min(tmr//500, 9)]
+        avy = vy*bb_accs[min(tmr//500, 9)]
+        
+        # par = tmr * 0.005
         for event in pg.event.get():
             if event.type == pg.QUIT: #pg.QUIT：×ボタン
                 return
@@ -122,14 +126,14 @@ def main():
             #動く予定の距離分マイナスして無かったことにする
 
         # bb_rct.move_ip(vx, vy)#練習２：移動させる
-        bb_rct.move_ip(vx*par, vy*par)#時間経過で爆弾の移動速度を上げていく
+        bb_rct.move_ip(avx, avy)#issueより上記で変更した値に引数を変更した #時間経過で爆弾の移動速度を上げていく
         yoko, tate = check_bound(bb_rct)#練習３
         if not yoko:
             vx *= -1 #マイナス1掛けて反転
         if not tate:
             vy *= -1
             
-        bb_img = pg.transform.rotozoom(bb_img, 0, 1+par)
+        
         screen.blit(kk_img, kk_rct)
         screen.blit(bb_img, bb_rct)#練習２：描画
         pg.display.update()
